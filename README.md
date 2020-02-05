@@ -5,29 +5,30 @@ account.
 
 
 
-## Breakdown Idea
+## Breakdown Idea part deux
 
 (from standard notes 2020-02-04)
 
 Start with a list of similar profiles.
 
-Grab all users’ posts' metadata (at least until I'm blocked). Also get
-metadata, include hashtags and commentary. Arrange these in a masonry
-layout.  
+For each of these, scrape out all the users (from comments) and
+hashtags used.
 
-Then scrape hashtags from these — particularly metadata on these hashtags. 
+For the list of hashtags, go through all of them with at least five
+(?) uses. 
 
-Can I query hashtag metadata? Thinking popularity and such =>  use the
-rarcega variant to scrape out X posts for a hashtag and estimate
-popularity. 
+For each hashtag, get 100 images (or some other amount?) as a
+proxy. Get the averages as a proxy for a sampling. (Get the total
+counts somehow?). __finds candidate hashtags__
 
-Use pseudo metrics like follower ratios, likes/comment ratios, length
-of average comments => some mixture to get an engagement metric of
-some sort for ranking value of a particular account 
+For each hashtag, also get each user. Get each user with high metrics
+__finds candidate influencers__. All other users get put into
+reachouts. 
 
-Then build a distributed crawler with many tiny machines that read
-from Celery Reddis queue (like $5 servers) and then write the output
-to s3. 
+For each user from the similar profile comments, get ones with high
+metrics __finds candidate influencers__ and all other users as
+reachouts. 
+
 
 
 ## Scraped Metadata JSON
@@ -71,7 +72,46 @@ to s3.
   * GraphProfileInfo -> profile metadata
 
 
-GHs
+## How scraper works
+
+```python
+def main():
+
+    # ...
+
+    scraper = InstagramScraper(**vars(args))
+
+    if args.login_user and args.login_pass:
+        scraper.authenticate_with_login()
+    else:
+        scraper.authenticate_as_guest()
+
+    if args.followings_input:
+        scraper.usernames = list(scraper.query_followings_gen(scraper.login_user))
+        if args.followings_output:
+            with open(scraper.destination+scraper.followings_output, 'w') as file:
+                for username in scraper.usernames:
+                    file.write(username + "\n")
+            # If not requesting anything else, exit
+            if args.media_types == ['none'] and args.media_metadata is False:
+                scraper.logout()
+                return
+
+    if args.tag:
+        scraper.scrape_hashtag()
+    elif args.location:
+        scraper.scrape_location()
+    elif args.search_location:
+        scraper.search_locations()
+    else:
+        scraper.scrape()
+
+    scraper.save_cookies()
+```
+
+
+
+## GHs
 
   - https://github.com/rarcega/instagram-scraper (one mega
     InstagramScraper object)
