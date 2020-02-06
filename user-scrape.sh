@@ -14,3 +14,7 @@
     --comments 
 
 # --destination patagonia.json
+
+
+# for just getting the user profile info
+# .venv/bin/instagram-scraper ashlynglasheen --media-types none -m 0 --profile-metadata

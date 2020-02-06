@@ -1,8 +1,9 @@
 *.json
-*.txt
+output.txt
 *.pyc
 *.png
 *.jpg
 *.jpeg
 *.mp4
 .venv/*
+*.csv

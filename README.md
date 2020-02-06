@@ -7,8 +7,6 @@ account.
 
 ## Breakdown Idea part deux
 
-(from standard notes 2020-02-04)
-
 Start with a list of similar profiles.
 
 For each of these, scrape out all the users (from comments) and
@@ -27,7 +25,7 @@ reachouts.
 
 For each user from the similar profile comments, get ones with high
 metrics __finds candidate influencers__ and all other users as
-reachouts. 
+reachouts.
 
 
 
@@ -75,6 +73,43 @@ reachouts.
 ## How scraper works
 
 ```python
+class InstagramScraper(object):
+
+    def __init__(self, **kwargs):
+        # ... defauilts below
+        username="",
+        usernames=[],
+        filename=None,
+        login_user=None,
+        login_pass=None,
+        followings_input=False,
+        followings_output="profiles.txt",
+        destination="./",
+        logger=None,
+        retain_username=False,
+        interactive=False,
+        quiet=False,
+        maximum=0,
+        media_metadata=False,
+        profile_metadata=False,
+        latest=False,
+        latest_stamps=False,
+        cookiejar=None,
+        filter_location=None,
+        filter_locations=None,
+        media_types=["image", "video", "story-image", "story-video"],
+        tag=False,
+        location=False,
+        search_location=False,
+        comments=False,
+        verbose=0,
+        include_location=False,
+        filter=None,
+        proxies={},
+        no_check_certificate=False,
+        template="{urlname}",
+        log_destination="",
+
 def main():
 
     # ...
