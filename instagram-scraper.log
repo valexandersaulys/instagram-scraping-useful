@@ -1,1 +1,2 @@
-2020-02-06 19:37:20,842 - instagram_scraper.app - INFO - Saving metadata general information on instagram.json
+2020-02-07 08:00:19,316 - instagram_scraper.app - ERROR - Login failed for mayorvas
+2020-02-07 08:00:19,317 - instagram_scraper.app - ERROR - {"authenticated": false, "user": true, "status": "ok"}
