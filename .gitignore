@@ -7,3 +7,4 @@ output.txt
 *.mp4
 .venv/*
 *.csv
+scrapes/*

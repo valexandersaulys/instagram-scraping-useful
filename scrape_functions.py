@@ -14,6 +14,8 @@ def scrape_username(username="patagonia", dst="./", maximum=12):
     """grab the metadata for a username"""
     if not os.path.exists(os.path.join(dst, username, username + ".json")):
         scraper = InstagramScraper(
+            login_user=os.environ.get("INSTAGRAM_USER", None),
+            login_pass=os.environ.get("INSTAGRAM_PWD", None),
             usernames=username.split(","),
             destination=dst,
             maximum=maximum,
@@ -22,7 +24,10 @@ def scrape_username(username="patagonia", dst="./", maximum=12):
             media_metadata=True,
             profile_metadata=True,
         )
-        scraper.authenticate_as_guest()
+        if os.environ.get("INSTAGRAM_USER", False):
+            scraper.authenticate_with_login()
+        else:
+            scraper.authenticate_as_guest()
         scraper.scrape()
 
     f = open(os.path.join(dst, username, username + ".json"), "rt")
@@ -43,6 +48,8 @@ def get_user_stats(u, dst="./"):
 
     if not os.path.exists(os.path.join(dst, u, u + ".json")):
         scraper = InstagramScraper(
+            login_user=os.environ.get("INSTAGRAM_USER", None),
+            login_pass=os.environ.get("INSTAGRAM_PWD", None),
             usernames=[u],
             destination=dst,
             maximum=12,
@@ -113,10 +120,12 @@ def get_user_stats(u, dst="./"):
     return d
 
 
-def scrape_hashtag(hashtag="", dst="./"):
+def scrape_hashtag(hashtag="wooliscruel", dst="./"):
     """ """
     scraper = InstagramScraper(
-        usernames=hashtag.split(","),
+        login_user=os.environ.get("INSTAGRAM_USER", None),
+        login_pass=os.environ.get("INSTAGRAM_PWD", None),
+        usernames=[hashtag],
         destination=dst,
         maximum=12,
         comments=True,
@@ -128,7 +137,7 @@ def scrape_hashtag(hashtag="", dst="./"):
     scraper.authenticate_as_guest()
     scraper.scrape()
 
-    f = open(os.path.join(dst, username, username + ".json"), "rt")
+    f = open(os.path.join(dst, hashtag, hashtag + ".json"), "rt")
     j = json.load(f)
     f.close()
     return j
@@ -176,17 +185,33 @@ def process_users_commenting(J, dst="./"):
     list_of_user_stats = (x.result() for x in list_of_user_stats)
     list_of_user_stats = list(filter(lambda x: x, list_of_user_stats))
 
-    return pd.DataFrame(list_of_user_stats)
+    return list_of_user_stats
+
+
+def scrape_user(user="patagonia"):
+    # example here
+    # scrape a username:
+    J = scrape_username(user, dst="./scrapes", maximum=12)
+    list_of_user_stats = process_users_commenting(J, dst="./%s" % user)
+    df = pd.DataFrame(list_of_user_stats)
+
+    df["follower-following-ratio"] = df["followers_count"] / df["following_count"]
+    df["comments_likes_ratio"] = df["avg_comments"] / df["avg_likes"]
+    df.to_csv("user_stats_@%s.csv" % user)
+
+
+def scrape_hashtag_fully(hashtag=""):
+    J = scrape_hashtag(hashtag="wooliscruel", dst="./")
+    list_of_user_stats = process_users_commenting(J, dst="./%s" % user)
+    df = pd.DataFrame(list_of_user_stats)
+
+    df["follower-following-ratio"] = df["followers_count"] / df["following_count"]
+    df["comments_likes_ratio"] = df["avg_comments"] / df["avg_likes"]
+    df.to_csv("user_stats_#%s.csv" % user)
 
 
 def main():
-    # example here
-    # scrape a username:
-    J = scrape_username("patagonia", maximum=12)
-    df = process_users_commenting(J, dst="./patagonia")
-    df["follower-following-ratio"] = df["followers_count"] / df["following_count"]
-    df["comments_likes_ratio"] = df["avg_comments"] / df["avg_likes"]
-    df.to_csv("user_stats_patagonia.csv")
+    scrape_user()
 
 
 if __name__ == "__main__":
