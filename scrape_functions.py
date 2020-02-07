@@ -191,8 +191,8 @@ def process_users_commenting(J, dst="./"):
 def scrape_user(user="patagonia"):
     # example here
     # scrape a username:
-    J = scrape_username(user, dst="./scrapes", maximum=12)
-    list_of_user_stats = process_users_commenting(J, dst="./%s/%s" % ("scrapes", user))
+    J = scrape_username(user, dst="./scrapes/%s" % user, maximum=12)
+    list_of_user_stats = process_users_commenting(J, dst="./scrapes/%s" % user)
     df = pd.DataFrame(list_of_user_stats)
 
     df["follower-following-ratio"] = df["followers_count"] / df["following_count"]
