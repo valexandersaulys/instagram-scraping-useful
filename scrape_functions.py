@@ -74,7 +74,7 @@ def get_user_stats(u, dst="./"):
         return {
             "followers_count": J["GraphProfileInfo"]["info"]["followers_count"],
             "following_count": J["GraphProfileInfo"]["info"]["following_count"],
-            "username": J["GraphProfileInfo"]["username"],
+            "username": u,
             "avg_likes": None,
             "std_likes": None,
             "median_likes": None,
@@ -107,7 +107,7 @@ def get_user_stats(u, dst="./"):
     d = {
         "followers_count": J["GraphProfileInfo"]["info"]["followers_count"],
         "following_count": J["GraphProfileInfo"]["info"]["following_count"],
-        "username": J["GraphProfileInfo"]["username"],
+        "username": u,
         "avg_likes": avg_likes,
         "std_likes": std_likes,
         "median_likes": median_likes,
@@ -177,7 +177,7 @@ def process_users_commenting(J, dst="./"):
 
     fs = []
     for user in list_of_users_to_scrape:
-        try_get_user_stats(user, dst)
+        list_Of_user_stats = try_get_user_stats(user, dst)
 
     list_of_user_stats = (x.result() for x in list_of_user_stats)
     list_of_user_stats = list(filter(lambda x: x, list_of_user_stats))
@@ -188,7 +188,7 @@ def scrape_user(user="patagonia"):
     # example here
     # scrape a username:
     J = scrape_username(user, dst="./scrapes/%s" % user, maximum=12)
-    list_of_user_stats = process_users_commenting(J, dst="./scrapes/%s" % user)
+    list_of_user_stats = process_users_commenting(u=J, dst="./scrapes/%s" % user)
     df = pd.DataFrame(list_of_user_stats)
 
     df["follower-following-ratio"] = df["followers_count"] / df["following_count"]
