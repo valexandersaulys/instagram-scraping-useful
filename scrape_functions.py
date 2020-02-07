@@ -12,7 +12,7 @@ MAX_WORKERS = 16
 
 def scrape_username(username="patagonia", dst="./", maximum=12):
     """grab the metadata for a username"""
-    if not os.path.exists(os.path.join(dst, username, username + ".json")):
+    if not os.path.exists(os.path.join(dst, username + ".json")):
         scraper = InstagramScraper(
             login_user=os.environ.get("INSTAGRAM_USER", None),
             login_pass=os.environ.get("INSTAGRAM_PWD", None),
@@ -30,7 +30,7 @@ def scrape_username(username="patagonia", dst="./", maximum=12):
             scraper.authenticate_as_guest()
         scraper.scrape()
 
-    f = open(os.path.join(dst, username, username + ".json"), "rt")
+    f = open(os.path.join(dst, username + ".json"), "rt")
     j = json.load(f)
     f.close()
     return j
@@ -176,15 +176,11 @@ def process_users_commenting(J, dst="./"):
             list_of_users_to_scrape.append(comment["owner"]["username"])
 
     fs = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        print("- - - - - processing %d users" % len(list_of_users_to_scrape))
-        for user in list_of_users_to_scrape:
-            fs.append(executor.submit(try_get_user_stats, user, dst))
+    for user in list_of_users_to_scrape:
+        try_get_user_stats(user, dst)
 
-    list_of_user_stats, _ = concurrent.futures.wait(fs, timeout=60)
     list_of_user_stats = (x.result() for x in list_of_user_stats)
     list_of_user_stats = list(filter(lambda x: x, list_of_user_stats))
-
     return list_of_user_stats
 
 

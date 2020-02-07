@@ -8,3 +8,4 @@ output.txt
 .venv/*
 *.csv
 scrapes/*
+*.out
